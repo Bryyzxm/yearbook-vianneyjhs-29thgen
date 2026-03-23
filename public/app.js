@@ -111,16 +111,19 @@ function showToast(m){
 function buildGrid(){
   var g = document.getElementById("the-grid");
   g.innerHTML = "";
-  PD.forEach(function(p){
+  var EAGER_COUNT = 8;
+  PD.forEach(function(p, i){
     var mc = MSG[p.id] ? MSG[p.id].length : 0;
     var el = document.createElement("div");
     el.className = "card";
     el.setAttribute("onclick","openProf("+p.id+")");
-    var ph = p.imgUrl ? "<img class='cimg' src='"+p.imgUrl+"' alt='"+p.name+"' loading='lazy'>" : "<div class='cph' style='background:"+p.color+";'>"+p.initials+"</div>";
+    var loadAttr = i < EAGER_COUNT ? "eager" : "lazy";
+    var ph = p.imgUrl ? "<img class='cimg' src='"+p.imgUrl+"' alt='"+p.name+"' loading='"+loadAttr+"' decoding='async' onload='this.closest(\".card\").classList.add(\"loaded\")'>" : "<div class='cph' style='background:"+p.color+";'>"+p.initials+"</div>";
     el.innerHTML = ph+"<div class='cfade'></div><div class='chint'>Buka Profil</div>";
     el.innerHTML += "<div class='cinfo'><div class='cname'>"+p.name+"</div><div class='ccls'>"+p.kelas+"</div>";
     if(mc > 0){ el.innerHTML += "<div class='cbdg'>"+mc+" pesan</div>"; }
     el.innerHTML += "</div>";
+    if(!p.imgUrl){ el.classList.add("loaded"); }
     g.appendChild(el);
   });
 }
@@ -132,7 +135,7 @@ function openProf(id){
   }
   if(!CUR) return;
   var h = document.getElementById("p-hero");
-  var ph = CUR.imgUrl ? "<img class='phimg' src='"+CUR.imgUrl+"' alt='"+CUR.name+"'>" : "<div class='phph' style='background:"+CUR.color+";'>"+CUR.initials+"</div>";
+  var ph = CUR.imgUrl ? "<img class='phimg' src='"+CUR.imgUrl+"' alt='"+CUR.name+"' decoding='async'>" : "<div class='phph' style='background:"+CUR.color+";'>"+CUR.initials+"</div>";
   h.innerHTML = ph+"<div class='phfade'></div><div class='phinfo'>";
   h.innerHTML += "<div class='phname'>"+CUR.name+"</div>";
   h.innerHTML += "<div class='phcls'>"+CUR.kelas+"</div>";
