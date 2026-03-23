@@ -108,9 +108,13 @@ function showToast(m){
   setTimeout(function(){ t.classList.remove("show"); },2500);
 }
 
+var gridBuildToken = 0;
+
 function buildGrid(){
   var g = document.getElementById("the-grid");
   g.innerHTML = "";
+  gridBuildToken++;
+  var currentToken = gridBuildToken;
   var EAGER_COUNT = 8;
   PD.forEach(function(p, i){
     var mc = MSG[p.id] ? MSG[p.id].length : 0;
@@ -118,13 +122,39 @@ function buildGrid(){
     el.className = "card";
     el.setAttribute("onclick","openProf("+p.id+")");
     var loadAttr = i < EAGER_COUNT ? "eager" : "lazy";
-    var ph = p.imgUrl ? "<img class='cimg' src='"+p.imgUrl+"' alt='"+p.name+"' loading='"+loadAttr+"' decoding='async' onload='this.closest(\".card\").classList.add(\"loaded\")'>" : "<div class='cph' style='background:"+p.color+";'>"+p.initials+"</div>";
+    var fetchAttr = i < 2 ? " fetchpriority='high'" : "";
+    var ph;
+    if(p.imgUrl){
+      ph = "<img class='cimg' src='"+p.imgUrl+"' alt='"+p.name+"' loading='"+loadAttr+"' decoding='async'"+fetchAttr+">";
+    } else {
+      ph = "<div class='cph' style='background:"+p.color+";'>"+p.initials+"</div>";
+    }
     el.innerHTML = ph+"<div class='cfade'></div><div class='chint'>Buka Profil</div>";
     el.innerHTML += "<div class='cinfo'><div class='cname'>"+p.name+"</div><div class='ccls'>"+p.kelas+"</div>";
     if(mc > 0){ el.innerHTML += "<div class='cbdg'>"+mc+" pesan</div>"; }
     el.innerHTML += "</div>";
-    if(!p.imgUrl){ el.classList.add("loaded"); }
     g.appendChild(el);
+    if(p.imgUrl){
+      var img = el.querySelector(".cimg");
+      if(img){
+        if(img.complete && img.naturalHeight > 0){ el.classList.add("loaded"); }
+        img.addEventListener("load", function(){
+          if(currentToken === gridBuildToken){ el.classList.add("loaded"); }
+        });
+        img.addEventListener("error", function(){
+          if(currentToken === gridBuildToken){
+            el.classList.add("loaded");
+            var phDiv = document.createElement("div");
+            phDiv.className = "cph";
+            phDiv.style.background = p.color;
+            phDiv.textContent = p.initials;
+            img.replaceWith(phDiv);
+          }
+        });
+      }
+    } else {
+      el.classList.add("loaded");
+    }
   });
 }
 
