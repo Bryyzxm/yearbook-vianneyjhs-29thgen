@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yearbook Anonymous Messages</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="pg active" id="pg-home">
+  <div class="hw">
+    <div class="hh">
+      <div class="eb">Class of 2025</div>
+      <h1>Yearbook <em>Anonymous</em> Messages</h1>
+      <p>Pilih seseorang dan tinggalkan pesan spesial untuknya — secara anonim.</p>
+    </div>
+    <div class="grid" id="the-grid"></div>
+  </div>
+  <div class="sfoot">Yearbook Anonymous Messages &mdash; Class of 2025</div>
+</div>
+
+<div class="pg" id="pg-profile">
+  <div class="pw">
+    <button class="bbtn" onclick="goHome()">Kembali ke semua</button>
+    <div class="phero" id="p-hero"></div>
+    <div class="mfbox">
+      <label class="flbl">Tulis pesan untuk <span id="p-short"></span></label>
+      <textarea class="mta" id="msg-in" placeholder="Tuliskan sesuatu yang tulus, lucu, atau berkesan..."></textarea>
+      <div class="ffoot">
+        <span class="anote">Pesanmu 100% anonim</span>
+        <button class="sbtn" onclick="kirim()">Kirim Pesan</button>
+      </div>
+    </div>
+    <div>
+      <div class="mhdr">
+        <span class="mtitle" id="m-count">Pesan</span>
+        <div class="mdiv"></div>
+      </div>
+      <div id="m-list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="del-modal">
+  <div class="ob">
+    <div class="ot">Hapus Pesan</div>
+    <div class="osu">Masukkan password admin. Pesan yang dihapus tidak bisa dikembalikan.</div>
+    <div class="pw-wrap">
+      <input class="oi" type="password" id="del-pw" placeholder="Password admin..." autocomplete="off">
+      <button class="eye-btn" id="eye-btn" type="button" title="Tampilkan/sembunyikan password">
+        <svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+    <div class="oerr" id="del-err">Password salah. Coba lagi.</div>
+    <div class="or">
+      <button class="oc" id="btn-cancel">Batal</button>
+      <button class="oconf" id="btn-confirm">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<button id="admin-toggle" class="admin-toggle" type="button">A</button>
+
+<script src="https://www.gstatic.com/firebasejs/12.11.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.11.0/firebase-database-compat.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yearbook Anonymous Messages</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#0e0e0f;--surface:#16161a;--surface2:#1e1e24;--border:rgba(255,255,255,0.07);--border-hover:rgba(255,255,255,0.22);--text:#f0eee8;--text-muted:#8a8890;--text-faint:#44434a;--accent:#c9a96e;--ff-serif:'Playfair Display',Georgia,serif;--ff-sans:'DM Sans',sans-serif;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--ff-sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;}
+.pg{display:none;}.pg.active{display:block;}
+.hw{max-width:1140px;margin:0 auto;padding:3rem 1.5rem 5rem;}
+.hh{text-align:center;padding:4rem 0 3.5rem;}
+.eb{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);font-weight:500;margin-bottom:1rem;display:flex;align-items:center;justify-content:center;gap:0.75rem;}
+.eb::before,.eb::after{content:'';flex:1;max-width:60px;height:1px;background:var(--accent);opacity:0.4;}
+.hh h1{font-family:var(--ff-serif);font-size:clamp(2.2rem,5vw,3.8rem);font-weight:400;letter-spacing:-0.02em;color:var(--text);line-height:1.15;margin-bottom:0.75rem;}
+.hh h1 em{font-style:italic;color:var(--accent);}
+.hh p{color:var(--text-muted);font-size:0.875rem;max-width:380px;margin:0 auto;}
+.grid{display:flex;flex-wrap:wrap;justify-content:center;gap:0.875rem;}
+.card{position:relative;border-radius:14px;overflow:hidden;cursor:pointer;aspect-ratio:3/4;width:170px;flex:0 0 170px;border:1px solid var(--border);background:var(--surface);transition:border-color 0.3s,transform 0.3s;}
+.card:hover{border-color:var(--border-hover);transform:translateY(-5px);}
+.cimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;display:block;transition:transform 0.5s;}
+.card:hover .cimg{transform:scale(1.06);}
+.cph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--ff-serif);font-size:2.5rem;color:rgba(255,255,255,0.18);transition:transform 0.5s;}
+.card:hover .cph{transform:scale(1.06);}
+.cfade{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 0%,transparent 35%,rgba(0,0,0,0.4) 55%,rgba(0,0,0,0.82) 75%,rgba(0,0,0,0.97) 90%,#000 100%);}
+.cinfo{position:absolute;bottom:0;left:0;right:0;padding:0.85rem 0.85rem 0.9rem;text-align:center;}
+.cname{font-family:Helvetica,Arial,sans-serif;font-size:1rem;font-weight:700;color:#fff;line-height:1.25;}
+.ccls{font-size:0.68rem;color:rgba(255,255,255,0.5);margin-top:0.15rem;font-family:Helvetica,Arial,sans-serif;}
+.cbdg{display:inline-block;margin-top:0.4rem;font-size:0.62rem;font-weight:500;background:rgba(201,169,110,0.18);color:var(--accent);border:1px solid rgba(201,169,110,0.28);border-radius:20px;padding:0.12rem 0.5rem;}
+.chint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.28);opacity:0;transition:opacity 0.25s;font-size:0.72rem;color:rgba(255,255,255,0.9);font-weight:500;letter-spacing:0.08em;text-transform:uppercase;}
+.card:hover .chint{opacity:1;}
+.pw{max-width:660px;margin:0 auto;padding:2.5rem 1.5rem 5rem;}
+.bbtn{display:inline-flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:var(--text-muted);background:none;border:none;cursor:pointer;font-family:var(--ff-sans);padding:0.5rem 0;transition:color 0.2s;margin-bottom:2rem;}
+.bbtn:hover{color:var(--accent);}.bbtn::before{content:'←';}
+.phero{position:relative;width:100%;height:280px;border-radius:18px;overflow:hidden;margin-bottom:1.25rem;border:1px solid var(--border);}
+.phimg{width:100%;height:100%;object-fit:cover;object-position:top;display:block;}
+.phph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--ff-serif);font-size:5rem;color:rgba(255,255,255,0.12);}
+.phfade{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 20%,rgba(0,0,0,0.85) 80%,#000 100%);}
+.phinfo{position:absolute;bottom:0;left:0;right:0;padding:1.5rem 1.5rem 1.25rem;}
+.phname{font-family:Helvetica,Arial,sans-serif;font-size:2rem;font-weight:700;color:#fff;line-height:1.15;}
+.phcls{font-size:0.78rem;color:rgba(255,255,255,0.5);margin-top:0.2rem;font-family:Helvetica,Arial,sans-serif;}
+.phtag{font-size:0.85rem;color:var(--accent);font-style:italic;font-family:var(--ff-serif);margin-top:0.4rem;}
+.mfbox{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1.25rem;}
+.flbl{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:500;margin-bottom:0.7rem;display:block;}
+.mta{width:100%;min-height:110px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:0.9rem 1rem;color:var(--text);font-family:var(--ff-sans);font-size:0.9rem;line-height:1.65;resize:vertical;outline:none;transition:border-color 0.2s;}
+.mta:focus{border-color:rgba(201,169,110,0.4);}.mta::placeholder{color:var(--text-faint);}
+.ffoot{display:flex;align-items:center;justify-content:space-between;margin-top:0.9rem;flex-wrap:wrap;gap:0.75rem;}
+.anote{font-size:0.72rem;color:var(--text-muted);display:flex;align-items:center;gap:0.35rem;}.anote::before{content:'🔒';font-size:0.72rem;}
+.mpw{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:0.7rem 1rem;color:var(--text);font-family:var(--ff-sans);font-size:0.85rem;outline:none;transition:border-color 0.2s;margin-bottom:0.75rem;}
+.mpw:focus{border-color:rgba(201,169,110,0.4);}.mpw::placeholder{color:var(--text-faint);}
+.sbtn{background:var(--accent);color:#0e0e0f;border:none;border-radius:50px;padding:0.6rem 1.4rem;font-size:0.85rem;font-weight:500;cursor:pointer;font-family:var(--ff-sans);transition:opacity 0.2s,transform 0.15s;}
+.sbtn:hover{opacity:0.88;transform:translateY(-1px);}
+.mhdr{display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;}
+.mtitle{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:500;}
+.mdiv{flex:1;height:1px;background:var(--border);}
+.nomsg{text-align:center;padding:2.5rem 1rem;color:var(--text-faint);font-size:0.875rem;font-style:italic;font-family:var(--ff-serif);}
+
+@keyframes mi{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+.mmeta{margin-top:0.5rem;font-size:0.7rem;color:var(--text-faint);display:flex;align-items:center;gap:0.4rem;}.mmeta::before{content:'✦';color:var(--accent);font-size:0.58rem;}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--border-hover);color:var(--text);padding:0.65rem 1.5rem;border-radius:50px;font-size:0.82rem;opacity:0;pointer-events:none;transition:all 0.3s;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.sfoot{text-align:center;padding:2rem;border-top:1px solid var(--border);color:var(--text-faint);font-size:0.72rem;letter-spacing:0.05em;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:99px;}
+@media(max-width:580px){.grid{grid-template-columns:repeat(3,1fr);}.phero{height:200px;}.phname{font-size:1.5rem;}}
+
+.mbub{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1rem 1.25rem;margin-bottom:0.75rem;position:relative;animation:mi 0.35s ease-out;}
+.dbtn{position:absolute;top:0.75rem;right:0.85rem;background:rgba(224,92,92,0.08);border:1px solid rgba(224,92,92,0.2);color:rgba(224,92,92,0.45);border-radius:6px;padding:0.2rem 0.55rem;font-size:0.68rem;cursor:pointer;font-family:Helvetica,Arial,sans-serif;transition:all 0.2s;}
+.dbtn:hover{background:rgba(224,92,92,0.22);color:#e05c5c;border-color:rgba(224,92,92,0.5);}
+.mtxt{font-size:0.9rem;color:var(--text);line-height:1.7;padding-right:5rem;}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:300;display:none;align-items:center;justify-content:center;}
+.ov.show{display:flex;}
+.ob{background:#16161a;border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:2rem;width:92%;max-width:360px;}
+.ot{font-family:Helvetica,Arial,sans-serif;font-size:1.05rem;font-weight:700;color:#f0eee8;margin-bottom:0.3rem;}
+.osu{font-size:0.82rem;color:#8a8890;margin-bottom:1.25rem;line-height:1.55;}
+.oi{width:100%;background:#0e0e0f;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:0.7rem 0.9rem;color:#f0eee8;font-family:Helvetica,Arial,sans-serif;font-size:0.9rem;outline:none;margin-bottom:0.75rem;transition:border-color 0.2s;}
+.oi:focus{border-color:rgba(201,169,110,0.4);}
+.pw-wrap{position:relative;margin-bottom:0.75rem;}
+.pw-wrap .oi{margin-bottom:0;padding-right:2.8rem;}
+.eye-btn{position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#8a8890;padding:0;display:flex;align-items:center;transition:color 0.2s;}
+.eye-btn:hover{color:#f0eee8;}
+.eye-btn svg{width:18px;height:18px;}
+.oerr{font-size:0.78rem;color:#e05c5c;margin-bottom:0.75rem;display:none;}
+.or{display:flex;gap:0.75rem;justify-content:flex-end;}
+.oc{background:none;border:1px solid rgba(255,255,255,0.1);color:#8a8890;border-radius:50px;padding:0.5rem 1.25rem;cursor:pointer;font-family:Helvetica,Arial,sans-serif;font-size:0.85rem;}
+.oconf{background:#e05c5c;border:none;color:#fff;border-radius:50px;padding:0.5rem 1.25rem;cursor:pointer;font-family:Helvetica,Arial,sans-serif;font-size:0.85rem;font-weight:600;}
+</style>
+</head>
+<body>
+<div class="pg active" id="pg-home">
+<div class="hw"><div class="hh"><div class="eb">Class of 2025</div><h1>Yearbook <em>Anonymous</em> Messages</h1><p>Pilih seseorang dan tinggalkan pesan spesial untuknya — secara anonim.</p></div><div class="grid" id="the-grid"></div></div><div class="sfoot">Yearbook Anonymous Messages &mdash; Class of 2025</div></div>
+<div class="pg" id="pg-profile">
+<div class="pw">
+<button class="bbtn" onclick="goHome()">Kembali ke semua</button>
+<div class="phero" id="p-hero"></div>
+<div class="mfbox"><label class="flbl">Tulis pesan untuk <span id="p-short"></span></label><textarea class="mta" id="msg-in" placeholder="Tuliskan sesuatu yang tulus, lucu, atau berkesan..."></textarea><div class="ffoot"><span class="anote">Pesanmu 100% anonim</span><button class="sbtn" onclick="kirim()">Kirim Pesan</button></div></div>
+<div><div class="mhdr"><span class="mtitle" id="m-count">Pesan</span><div class="mdiv"></div></div><div id="m-list"></div></div></div></div>
+<div class="ov" id="del-modal">
+<div class="ob">
+<div class="ot">Hapus Pesan</div>
+<div class="osu">Masukkan password admin. Pesan yang dihapus tidak bisa dikembalikan.</div>
+<div class="pw-wrap">
+<input class="oi" type="password" id="del-pw" placeholder="Password admin..." autocomplete="off">
+<button class="eye-btn" id="eye-btn" type="button" title="Tampilkan/sembunyikan password">
+<svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+</svg>
+</button>
+</div>
+<div class="oerr" id="del-err">Password salah. Coba lagi.</div>
+<div class="or">
+<button class="oc" id="btn-cancel">Batal</button>
+<button class="oconf" id="btn-confirm">Hapus</button>
+</div></div></div>
+<div class="toast" id="toast"></div>
+<script>
+var PD=[{"id":0,"name":"Annabelle Calista Wijaya","kelas":"IX A","imgUrl":"https://i.ibb.co.com/HfZMKbLr/Anabelle.png","tagline":"\"Hidupmu, ceritamu.\"","color":"#2a3a4a","initials":"AC"},{"id":1,"name":"Antonius Favian Kurnia","kelas":"IX A","imgUrl":"https://i.ibb.co.com/VphD6bHL/Vian.png","tagline":"\"Senyum itu gratis.\"","color":"#3a2a4a","initials":"AF"},{"id":2,"name":"Aristyawidya Tri Indraloka","kelas":"IX A","imgUrl":"https://i.ibb.co.com/prn0vrc6/Widya-2.png","tagline":"\"Tetap bersinar.\"","color":"#2a4a3a","initials":"AT"},{"id":3,"name":"Bryan Fildy","kelas":"IX A","imgUrl":"https://i.ibb.co.com/spRHV1tz/Bryan.png","tagline":"\"Jangan lupa bahagia.\"","color":"#4a3a2a","initials":"BF"},{"id":4,"name":"Clarisa Florence Winanto","kelas":"IX A","imgUrl":"https://i.ibb.co.com/MykdtP0v/Clarisa.png","tagline":"\"Kamu lebih kuat dari yang kamu pikir.\"","color":"#2a4a4a","initials":"CF"},{"id":5,"name":"Darrel Xaviere Widjaja","kelas":"IX A","imgUrl":"https://i.ibb.co.com/xS6JsDw7/Darrel-1.png","tagline":"\"Setiap hari adalah petualangan.\"","color":"#4a2a3a","initials":"DX"},{"id":6,"name":"Dean Frederic Ottelo","kelas":"IX A","imgUrl":"https://i.ibb.co.com/QvNgvxzq/Dean.png","tagline":"\"Jadilah dirimu yang terbaik.\"","color":"#3a4a2a","initials":"DF"},{"id":7,"name":"Gabriel Pandu Anjasa Putra","kelas":"IX A","imgUrl":"https://i.ibb.co.com/HLb5ZXY5/Pandu.png","tagline":"\"Selalu ada besok yang lebih cerah.\"","color":"#4a2a4a","initials":"GP"},{"id":8,"name":"Gabriella Michelle Josephine","kelas":"IX A","imgUrl":"https://i.ibb.co.com/Kxs0tQxx/Michelle.png","tagline":"\"Mimpi besar, usaha nyata.\"","color":"#2a3a3a","initials":"GM"},{"id":9,"name":"Gavin Tan","kelas":"IX A","imgUrl":"https://i.ibb.co.com/6JLTCz2F/Gavin.png","tagline":"\"Sukses menunggumu di depan.\"","color":"#3a2a2a","initials":"GT"},{"id":10,"name":"Genevieve Amadea Lumi","kelas":"IX A","imgUrl":"https://i.ibb.co.com/gZ18k70j/Vie-2.png","tagline":"\"Hidupmu, ceritamu.\"","color":"#2a3a4a","initials":"GA"},{"id":11,"name":"Gwen Velisha Lim","kelas":"IX A","imgUrl":"https://i.ibb.co.com/B2sGdSHz/Gwen.png","tagline":"\"Senyum itu gratis.\"","color":"#3a2a4a","initials":"GV"},{"id":12,"name":"Hazael Reydo Cornelis Lukito","kelas":"IX A","imgUrl":"https://i.ibb.co.com/dJXQwsQ1/Reydo.png","tagline":"\"Tetap bersinar.\"","color":"#2a4a3a","initials":"HR"},{"id":13,"name":"Hope Amabelle Budiyanto","kelas":"IX A","imgUrl":"https://i.ibb.co.com/99cN6RJb/Hope.png","tagline":"\"Jangan lupa bahagia.\"","color":"#4a3a2a","initials":"HA"},{"id":14,"name":"Jose Antonio Ola Padak","kelas":"IX A","imgUrl":"https://i.ibb.co.com/8L8ht9Zr/Jose.png","tagline":"\"Kamu lebih kuat dari yang kamu pikir.\"","color":"#2a4a4a","initials":"JA"},{"id":15,"name":"Kristian Nathanael Manalu","kelas":"IX A","imgUrl":"https://i.ibb.co.com/tpPRpmdB/FGladys-2.png","tagline":"\"Setiap hari adalah petualangan.\"","color":"#4a2a3a","initials":"KN"},{"id":16,"name":"Nathan Pangkawira","kelas":"IX A","imgUrl":"https://i.ibb.co.com/8gQjKQZj/Nathan.png","tagline":"\"Jadilah dirimu yang terbaik.\"","color":"#3a4a2a","initials":"NP"},{"id":17,"name":"Rebeka Angelina Nadeak","kelas":"IX A","imgUrl":"https://i.ibb.co.com/4gNm6s5n/Rebeka.png","tagline":"\"Selalu ada besok yang lebih cerah.\"","color":"#4a2a4a","initials":"RA"},{"id":18,"name":"Sebastian Orlando","kelas":"IX A","imgUrl":"https://i.ibb.co.com/pHvQB5X/Nando.jpg","tagline":"\"Mimpi besar, usaha nyata.\"","color":"#2a3a3a","initials":"SO"},{"id":19,"name":"Theresia Angelina","kelas":"IX A","imgUrl":"https://i.ibb.co.com/rf4qDPnV/FGladys-1.png","tagline":"\"Sukses menunggumu di depan.\"","color":"#3a2a2a","initials":"TA"},{"id":20,"name":"Vannesa Shannon Tirtarahaja","kelas":"IX A","imgUrl":"https://i.ibb.co.com/9HmpgM4p/Shannon.png","tagline":"\"Hidupmu, ceritamu.\"","color":"#2a3a4a","initials":"VS"},{"id":21,"name":"Verren Nathallie","kelas":"IX A","imgUrl":"https://i.ibb.co.com/g5rs8F3/Verren.png","tagline":"\"Senyum itu gratis.\"","color":"#3a2a4a","initials":"VN"},{"id":22,"name":"Yoel Natanael Laia","kelas":"IX A","imgUrl":"https://i.ibb.co.com/rKd61jrH/Yoel.png","tagline":"\"Tetap bersinar.\"","color":"#2a4a3a","initials":"YN"},{"id":23,"name":"Adelio Lamond Combitz T. P Sipahutar","kelas":"IX B","imgUrl":"https://i.ibb.co.com/Z679HJjf/Adelio-2.png","tagline":"\"Jangan lupa bahagia.\"","color":"#4a3a2a","initials":"AL"},{"id":24,"name":"Agatha Graceline Zawn Suherza","kelas":"IX B","imgUrl":"https://i.ibb.co.com/HDqQxkm2/Agatha-1.png","tagline":"\"Kamu lebih kuat dari yang kamu pikir.\"","color":"#2a4a4a","initials":"AG"},{"id":25,"name":"Ahmad Miftah Pratama","kelas":"IX B","imgUrl":"https://i.ibb.co.com/6CjLxRN/Ahmad.png","tagline":"\"Setiap hari adalah petualangan.\"","color":"#4a2a3a","initials":"AM"},{"id":26,"name":"Alexis Fidelio Yap","kelas":"IX B","imgUrl":"https://i.ibb.co.com/vvV23rvw/Fidel.png","tagline":"\"Jadilah dirimu yang terbaik.\"","color":"#3a4a2a","initials":"AF"},{"id":27,"name":"Bentley Amadeus","kelas":"IX B","imgUrl":"https://i.ibb.co.com/TBZZCsQ4/Bentley.png","tagline":"\"Selalu ada besok yang lebih cerah.\"","color":"#4a2a4a","initials":"BA"},{"id":28,"name":"Cherish Alexandra Siyadi","kelas":"IX B","imgUrl":"https://i.ibb.co.com/GQySkHBd/Cherish.png","tagline":"\"Mimpi besar, usaha nyata.\"","color":"#2a3a3a","initials":"CA"},{"id":29,"name":"Erik Agustinus","kelas":"IX B","imgUrl":"https://i.ibb.co.com/hJPQkfwC/Erik.png","tagline":"\"Sukses menunggumu di depan.\"","color":"#3a2a2a","initials":"EA"},{"id":30,"name":"Eugenia Meta Angelica Simanjorang","kelas":"IX B","imgUrl":"https://i.ibb.co.com/prJB2ymg/Eugenia.png","tagline":"\"Hidupmu, ceritamu.\"","color":"#2a3a4a","initials":"EM"},{"id":31,"name":"Faith Adabelle Budiyanto","kelas":"IX B","imgUrl":"https://i.ibb.co.com/5Wtt086K/Faith.png","tagline":"\"Senyum itu gratis.\"","color":"#3a2a4a","initials":"FA"},{"id":32,"name":"Felix Moses","kelas":"IX B","imgUrl":"https://i.ibb.co.com/nqHnktqs/Felix-1.png","tagline":"\"Tetap bersinar.\"","color":"#2a4a3a","initials":"FM"},{"id":33,"name":"Gabriel Richard Kei Nai Putra Junior","kelas":"IX B","imgUrl":"https://i.ibb.co.com/rKHfd1QD/Juan.png","tagline":"\"Jangan lupa bahagia.\"","color":"#4a3a2a","initials":"GR"},{"id":34,"name":"Gladys Sapphira","kelas":"IX B","imgUrl":"https://i.ibb.co.com/23wNcLfs/Gladys.png","tagline":"\"Kamu lebih kuat dari yang kamu pikir.\"","color":"#2a4a4a","initials":"GS"},{"id":35,"name":"Jason Carlton Hambali","kelas":"IX B","imgUrl":"https://i.ibb.co.com/Jws94PHc/Jason.png","tagline":"\"Setiap hari adalah petualangan.\"","color":"#4a2a3a","initials":"JC"},{"id":36,"name":"Jeremy Nathanael Chandra","kelas":"IX B","imgUrl":"https://i.ibb.co.com/hRHsKXR0/Jeremy.png","tagline":"\"Jadilah dirimu yang terbaik.\"","color":"#3a4a2a","initials":"JN"},{"id":37,"name":"Jessie Benjamin","kelas":"IX B","imgUrl":"https://i.ibb.co.com/39GZXFGJ/Jessie.png","tagline":"\"Selalu ada besok yang lebih cerah.\"","color":"#4a2a4a","initials":"JB"},{"id":38,"name":"Joshua Feraldo Ngadimin","kelas":"IX B","imgUrl":"https://i.ibb.co.com/S4Ry866c/Joshua.png","tagline":"\"Mimpi besar, usaha nyata.\"","color":"#2a3a3a","initials":"JF"},{"id":39,"name":"Justina Patricia","kelas":"IX B","imgUrl":"https://i.ibb.co.com/BV1qqZnd/Justina.png","tagline":"\"Sukses menunggumu di depan.\"","color":"#3a2a2a","initials":"JP"},{"id":40,"name":"Lionel Liong","kelas":"IX B","imgUrl":"https://i.ibb.co.com/QjNT8258/Lionel.png","tagline":"\"Hidupmu, ceritamu.\"","color":"#2a3a4a","initials":"LL"},{"id":41,"name":"Marvellino Jose","kelas":"IX B","imgUrl":"https://i.ibb.co.com/j9CkwQQt/Marvel.png","tagline":"\"Senyum itu gratis.\"","color":"#3a2a4a","initials":"MJ"},{"id":42,"name":"Regina Caeli","kelas":"IX B","imgUrl":"https://i.ibb.co.com/nG3yDL5/Regina.png","tagline":"\"Tetap bersinar.\"","color":"#2a4a3a","initials":"RC"},{"id":43,"name":"Sophie Elizabeth Gunawan","kelas":"IX B","imgUrl":"https://i.ibb.co.com/wNd4xZ49/Sophie.png","tagline":"\"Jangan lupa bahagia.\"","color":"#4a3a2a","initials":"SE"},{"id":44,"name":"Vanessa Lim","kelas":"IX B","imgUrl":"https://i.ibb.co.com/DHwStWBQ/Vanessa.png","tagline":"\"Kamu lebih kuat dari yang kamu pikir.\"","color":"#2a4a4a","initials":"VL"},{"id":45,"name":"Winson Mikael Kurniawan","kelas":"IX B","imgUrl":"https://i.ibb.co.com/TBL0w8Vc/Winson.png","tagline":"\"Setiap hari adalah petualangan.\"","color":"#4a2a3a","initials":"WM"}];
+var MSG={};
+PD.forEach(function(p){MSG[p.id]=[];});
+var CUR=null;
+var APWD="Admin29thGen";
+var DEL_PID=null, DEL_IDX=null;
+
+function ts(){var n=new Date();return n.toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"})+" · "+n.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");}
+function showToast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},2500);}
+
+function buildGrid(){
+  var g=document.getElementById("the-grid");g.innerHTML="";
+  PD.forEach(function(p){
+    var mc=MSG[p.id].length;
+    var el=document.createElement("div");
+    el.className="card";
+    el.setAttribute("onclick","openProf("+p.id+")");
+    var ph=p.imgUrl?"<img class='cimg' src='"+p.imgUrl+"' alt='"+p.name+"' loading='lazy'>":
+      "<div class='cph' style='background:"+p.color+";'>"+p.initials+"</div>";
+    el.innerHTML=ph+"<div class='cfade'></div><div class='chint'>Buka Profil</div>";
+    el.innerHTML+="<div class='cinfo'><div class='cname'>"+p.name+"</div><div class='ccls'>"+p.kelas+"</div>";
+    if(mc>0){el.innerHTML+="<div class='cbdg'>"+mc+" pesan</div>";}
+    el.innerHTML+="</div>";
+    g.appendChild(el);
+  });
+}
+
+function openProf(id){
+  CUR=null;
+  for(var i=0;i<PD.length;i++){if(PD[i].id===id){CUR=PD[i];break;}}
+  if(!CUR)return;
+  var h=document.getElementById("p-hero");
+  var ph=CUR.imgUrl?"<img class='phimg' src='"+CUR.imgUrl+"' alt='"+CUR.name+"'>":
+    "<div class='phph' style='background:"+CUR.color+";'>"+CUR.initials+"</div>";
+  h.innerHTML=ph+"<div class='phfade'></div><div class='phinfo'>";
+  h.innerHTML+="<div class='phname'>"+CUR.name+"</div>";
+  h.innerHTML+="<div class='phcls'>"+CUR.kelas+"</div>";
+  h.innerHTML+="<div class='phtag'>"+CUR.tagline+"</div></div>";
+  document.getElementById("p-short").textContent=CUR.name.split(" ")[0];
+  document.getElementById("msg-in").value="";
+  renderMsgs(id);
+  document.getElementById("pg-home").classList.remove("active");
+  document.getElementById("pg-profile").classList.add("active");
+  window.scrollTo(0,0);
+}
+
+function renderMsgs(id){
+  var l=document.getElementById("m-list");
+  var m=MSG[id];
+  document.getElementById("m-count").textContent=m.length===0?"Belum ada pesan":m.length+" Pesan";
+  if(!m.length){l.innerHTML="<div class='nomsg'>Jadilah yang pertama meninggalkan pesan ✶</div>";return;}
+  var html="";
+  for(var i=m.length-1;i>=0;i--){
+    html+="<div class='mbub'>"
+      +"<button class='dbtn' data-pid='"+id+"' data-idx='"+i+"'>Hapus</button>"
+      +"<div class='mtxt'>"+esc(m[i].text)+"</div>"
+      +"<div class='mmeta'>"+m[i].time+"</div>"
+      +"</div>";
+  }
+  l.innerHTML=html;
+}
+
+function kirim(){
+  var inp=document.getElementById("msg-in");
+  var txt=inp.value.trim();
+  if(!txt){showToast("Pesan tidak boleh kosong.");return;}
+  if(txt.length>500){showToast("Maks. 500 karakter.");return;}
+  MSG[CUR.id].push({text:txt,time:ts()});
+  inp.value="";
+  renderMsgs(CUR.id);
+  buildGrid();
+  showToast("Pesan terkirim! ✶");
+}
+
+function goHome(){
+  document.getElementById("pg-profile").classList.remove("active");
+  document.getElementById("pg-home").classList.add("active");
+  window.scrollTo(0,0);
+}
+
+function openModal(pid,idx){
+  DEL_PID=pid; DEL_IDX=idx;
+  document.getElementById("del-pw").value="";
+  document.getElementById("del-err").style.display="none";
+  document.getElementById("del-modal").classList.add("show");
+  setTimeout(function(){document.getElementById("del-pw").focus();},80);
+}
+
+function closeModal(){
+  DEL_PID=null; DEL_IDX=null;
+  document.getElementById("del-modal").classList.remove("show");
+}
+
+function confirmDel(){
+  var pw=document.getElementById("del-pw").value;
+  if(pw!==APWD){
+    document.getElementById("del-err").textContent="Invalid Password";
+    document.getElementById("del-err").style.display="block";
+    document.getElementById("del-pw").value="";
+    return;
+  }
+  document.getElementById("del-err").style.display="none";
+  var pid=DEL_PID;
+  var idx=DEL_IDX;
+  MSG[pid].splice(idx,1);
+  closeModal();
+  renderMsgs(pid);
+  buildGrid();
+  showToast("Pesan dihapus.");
+}
+
+// Event listeners
+document.addEventListener("click",function(e){
+  var btn=e.target.closest(".dbtn");
+  if(btn){
+    openModal(parseInt(btn.getAttribute("data-pid")),parseInt(btn.getAttribute("data-idx")));
+    return;
+  }
+  if(e.target===document.getElementById("del-modal")) closeModal();
+});
+document.getElementById("btn-cancel").addEventListener("click",closeModal);
+document.getElementById("btn-confirm").addEventListener("click",confirmDel);
+document.getElementById("del-pw").addEventListener("keydown",function(e){if(e.key==="Enter")confirmDel();});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeModal();});
+document.getElementById("eye-btn").addEventListener("click",function(){
+  var inp=document.getElementById("del-pw");
+  var icon=document.getElementById("eye-icon");
+  if(inp.type==="password"){
+    inp.type="text";
+    icon.innerHTML='<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    inp.type="password";
+    icon.innerHTML='<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+  inp.focus();
+});
+
+buildGrid();
+</script>
+</body>
+</html>
