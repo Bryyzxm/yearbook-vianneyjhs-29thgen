@@ -11,6 +11,18 @@
 </head>
 <body>
 
+<div class="intro-overlay" id="intro-overlay">
+  <div class="intro-particles" id="intro-particles"></div>
+  <div class="intro-text" id="intro-text"><span class="cursor"></span></div>
+  <div class="intro-sub" id="intro-sub">Class of 2025/2026</div>
+  <div class="intro-hint" id="intro-hint">Klik layar untuk memutar lagu</div>
+</div>
+
+<audio id="bg-audio" loop preload="auto" src="graduation-song.mp3"></audio>
+<button class="audio-toggle" id="audio-toggle" type="button" title="Play/Pause Music">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+</button>
+
 <div class="pg active" id="pg-home">
   <div class="hw">
     <div class="hh">
@@ -18,17 +30,34 @@
       <h1>Yearbook <em>Anonymous</em> Messages</h1>
       <p>Pilih seseorang dan tinggalkan pesan spesial untuknya — secara anonim.</p>
     </div>
+    <div class="total-counter">
+      <div class="counter-label">Total Pesan di Kelas</div>
+      <div class="counter-value" id="total-counter">0</div>
+    </div>
     <div class="grid" id="the-grid"></div>
+    <div class="random-section">
+      <button class="random-btn" onclick="showRandomMsg()"><span class="dice">&#x1F3B2;</span> Pesan Random dari Kelas</button>
+      <div class="random-msg-display" id="random-msg">
+        <div class="random-msg-text" id="random-text"></div>
+        <div class="random-msg-from" id="random-from"></div>
+      </div>
+    </div>
   </div>
   <div class="sfoot">Yearbook Anonymous Messages &mdash; Class of 2025</div>
 </div>
 
 <div class="pg" id="pg-profile">
   <div class="pw">
-    <button class="bbtn" onclick="goHome()">Kembali ke semua</button>
+    <button class="bbtn" onclick="goHomeAnimated()">Kembali ke semua</button>
     <div class="phero" id="p-hero"></div>
     <div class="mfbox">
       <label class="flbl">Tulis pesan untuk <span id="p-short"></span></label>
+      <div class="category-selector" id="cat-selector">
+        <button class="cat-btn selected" data-cat="umum">Umum</button>
+        <button class="cat-btn" data-cat="lucu">Lucu</button>
+        <button class="cat-btn" data-cat="menyentuh">Menyentuh</button>
+        <button class="cat-btn" data-cat="nasihat">Nasihat</button>
+      </div>
       <textarea class="mta" id="msg-in" placeholder="Tuliskan sesuatu yang tulus, lucu, atau berkesan..."></textarea>
       <div class="ffoot">
         <span class="anote">Pesanmu 100% anonim</span>
@@ -47,7 +76,7 @@
 
 <div class="ov" id="del-modal">
   <div class="ob">
-    <div class="ot">Hapus Pesan</div>
+    <div class="ot">Hapus Pesa.n</div>
     <div class="osu">Masukkan password admin. Pesan yang dihapus tidak bisa dikembalikan.</div>
     <div class="pw-wrap">
       <input class="oi" type="password" id="del-pw" placeholder="Password admin..." autocomplete="off">

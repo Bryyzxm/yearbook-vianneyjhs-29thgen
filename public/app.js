@@ -1,3 +1,4 @@
+var SELECTED_CAT = "umum";
 var firebaseConfig = {
   apiKey: "AIzaSyBdgEaVIMmeW3UlUPyuK2pBNSmlgpyD3oU",
   authDomain: "yearbook-vianney.firebaseapp.com",
@@ -76,6 +77,13 @@ var DEL_PID = null, DEL_IDX = null;
 var ADMIN_MODE = false;
 var ADMIN_KEY_COUNT = 0;
 var ADMIN_KEY_TIMER = null;
+var REACTIONS = {};
+var REACTIONS_REF = db.ref('reactions');
+var MY_ID = localStorage.getItem('ybid');
+if(!MY_ID){
+  MY_ID = 'u'+Date.now().toString(36)+Math.random().toString(36).substr(2,9);
+  localStorage.setItem('ybid',MY_ID);
+}
 
 function setAdminMode(next){
   ADMIN_MODE = next;
@@ -108,6 +116,71 @@ function showToast(m){
   setTimeout(function(){ t.classList.remove("show"); },2500);
 }
 
+function fireConfetti(){
+  var container = document.createElement("div");
+  container.className = "confetti-container";
+  document.body.appendChild(container);
+  var colors = ["#c9a96e","#ffd700","#ff6b6b","#69db7c","#74c0fc","#f783ac","#da77f2"];
+  var shapes = ["circle","square"];
+  for(var i=0;i<60;i++){
+    var c = document.createElement("div");
+    c.className = "confetti";
+    var color = colors[Math.floor(Math.random()*colors.length)];
+    var shape = shapes[Math.floor(Math.random()*shapes.length)];
+    var size = 6+Math.random()*8;
+    var left = Math.random()*100;
+    var drift = (Math.random()-0.5)*200;
+    var rot = Math.random()*720;
+    var dur = 1.5+Math.random()*1.5;
+    var delay = Math.random()*0.5;
+    var borderRadius = shape==="circle"?"50%":"2px";
+    c.style.cssText = "left:"+left+"%;top:-10px;width:"+size+"px;height:"+size+"px;background:"+color+";border-radius:"+borderRadius+";--drift:"+drift+"px;--rot:"+rot+"deg;--fall-dur:"+dur+"s;--fall-delay:"+delay+"s;";
+    container.appendChild(c);
+  }
+  setTimeout(function(){ container.remove(); },3500);
+}
+
+function animateCounter(el,target){
+  var current = parseInt(el.textContent)||0;
+  if(current===target) return;
+  var duration = 800;
+  var start = performance.now();
+  function step(now){
+    var progress = Math.min((now-start)/duration,1);
+    var eased = 1-Math.pow(1-progress,3);
+    el.textContent = Math.round(current+(target-current)*eased);
+    if(progress<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function updateTotalCounter(){
+  var total = 0;
+  for(var k in MSG){ total += (MSG[k]||[]).length; }
+  animateCounter(document.getElementById("total-counter"),total);
+}
+
+function goHomeAnimated(){
+  var profile = document.getElementById("pg-profile");
+  var home = document.getElementById("pg-home");
+  profile.classList.add("fade-out");
+  setTimeout(function(){
+    profile.classList.remove("active","fade-out");
+    home.classList.add("active");
+    buildGrid();
+    window.scrollTo(0,0);
+  },400);
+}
+
+function openProfAnimated(id){
+  var home = document.getElementById("pg-home");
+  home.classList.add("fade-out");
+  setTimeout(function(){
+    home.classList.remove("active","fade-out");
+    openProf(id);
+  },400);
+}
+
 var gridBuildToken = 0;
 
 function buildGrid(){
@@ -120,7 +193,8 @@ function buildGrid(){
     var mc = MSG[p.id] ? MSG[p.id].length : 0;
     var el = document.createElement("div");
     el.className = "card";
-    el.setAttribute("onclick","openProf("+p.id+")");
+    el.style.animationDelay = (i*0.05)+"s";
+    el.setAttribute("onclick","openProfAnimated("+p.id+")");
     var loadAttr = i < EAGER_COUNT ? "eager" : "lazy";
     var fetchAttr = i < 2 ? " fetchpriority='high'" : "";
     var ph;
@@ -156,6 +230,7 @@ function buildGrid(){
       el.classList.add("loaded");
     }
   });
+  updateTotalCounter();
 }
 
 function openProf(id){
@@ -188,13 +263,61 @@ function renderMsgs(id){
   }
   var html = "";
   for(var i = m.length-1; i >= 0; i--){
+    var msg = m[i];
+    var cat = msg.category || "umum";
+    var catLabel = cat==="umum" ? "" : "<span class='cat-badge cat-"+cat+"'>"+cat.charAt(0).toUpperCase()+cat.slice(1)+"</span>";
+    var key = (MSG_KEYS[id]||[])[i] || "";
+    var r = REACTIONS[key] || {};
+    var likeUsers = r.like ? Object.keys(r.like) : [];
+    var heartUsers = r.heart ? Object.keys(r.heart) : [];
+    var laughUsers = r.laugh ? Object.keys(r.laugh) : [];
+    var hasLiked = likeUsers.indexOf(MY_ID) !== -1;
+    var hasHearted = heartUsers.indexOf(MY_ID) !== -1;
+    var hasLaughed = laughUsers.indexOf(MY_ID) !== -1;
     html += "<div class='mbub'>"
       +(ADMIN_MODE ? "<button class='dbtn' data-pid='"+id+"' data-idx='"+i+"'>Hapus</button>" : "")
-      +"<div class='mtxt'>"+esc(m[i].text)+"</div>"
-      +"<div class='mmeta'>"+m[i].time+"</div>"
+      +"<div class='mtxt'>"+esc(msg.text)+catLabel+"</div>"
+      +"<div class='mmeta'>"+msg.time+"</div>"
+      +"<div class='reactions'>"
+      +"<button class='react-btn"+(hasLiked?" reacted":"")+"' onclick='toggleReaction(\""+key+"\",\"like\")'>&#x1F44D; <span class='count'>"+(likeUsers.length||"")+"</span></button>"
+      +"<button class='react-btn"+(hasHearted?" reacted":"")+"' onclick='toggleReaction(\""+key+"\",\"heart\")'>&#x2764; <span class='count'>"+(heartUsers.length||"")+"</span></button>"
+      +"<button class='react-btn"+(hasLaughed?" reacted":"")+"' onclick='toggleReaction(\""+key+"\",\"laugh\")'>&#x1F602; <span class='count'>"+(laughUsers.length||"")+"</span></button>"
+      +"</div>"
       +"</div>";
   }
   l.innerHTML = html;
+}
+
+function toggleReaction(msgKey,type){
+  if(!msgKey) return;
+  var ref = REACTIONS_REF.child(msgKey).child(type).child(MY_ID);
+  ref.once('value',function(snap){
+    if(snap.exists()){
+      ref.remove();
+    } else {
+      ref.set(true);
+    }
+  });
+}
+
+function showRandomMsg(){
+  var allMsgs = [];
+  for(var pid in MSG){
+    var bucket = MSG[pid]||[];
+    for(var i=0;i<bucket.length;i++){
+      var p = null;
+      for(var j=0;j<PD.length;j++){ if(PD[j].id==pid){ p=PD[j]; break; } }
+      allMsgs.push({text:bucket[i].text, to:p?p.name:"Seseorang"});
+    }
+  }
+  if(!allMsgs.length){ showToast("Belum ada pesan di kelas."); return; }
+  var pick = allMsgs[Math.floor(Math.random()*allMsgs.length)];
+  var display = document.getElementById("random-msg");
+  document.getElementById("random-text").textContent = pick.text;
+  document.getElementById("random-from").textContent = "— untuk "+pick.to;
+  display.classList.remove("show");
+  void display.offsetWidth;
+  display.classList.add("show");
 }
 
 function kirim(){
@@ -202,10 +325,11 @@ function kirim(){
   var txt = inp.value.trim();
   if(!txt){ showToast("Pesan tidak boleh kosong."); return; }
   if(txt.length > 500){ showToast("Maks. 500 karakter."); return; }
-  var newMsg = {text:txt, time:ts()};
+  var newMsg = {text:txt, time:ts(), category:SELECTED_CAT};
   messagesRef.child(String(CUR.id)).push(newMsg)
     .then(function(){
       inp.value = "";
+      fireConfetti();
       showToast("Pesan terkirim! ✶");
     })
     .catch(function(err){
@@ -215,9 +339,7 @@ function kirim(){
 }
 
 function goHome(){
-  document.getElementById("pg-profile").classList.remove("active");
-  document.getElementById("pg-home").classList.add("active");
-  window.scrollTo(0,0);
+  goHomeAnimated();
 }
 
 function openModal(pid,idx){
@@ -335,3 +457,142 @@ document.addEventListener("keydown",function(e){
 
 setAdminMode(false);
 buildGrid();
+
+document.addEventListener("click",function(e){
+  var catBtn = e.target.closest(".cat-btn");
+  if(catBtn){
+    var parent = catBtn.parentElement;
+    parent.querySelectorAll(".cat-btn").forEach(function(b){ b.classList.remove("selected"); });
+    catBtn.classList.add("selected");
+    SELECTED_CAT = catBtn.getAttribute("data-cat")||"umum";
+  }
+});
+
+REACTIONS_REF.on('value',function(snapshot){
+  REACTIONS = snapshot.val()||{};
+  if(CUR) renderMsgs(CUR.id);
+});
+
+try{(function(){
+  var overlay = document.getElementById("intro-overlay");
+  var textEl = document.getElementById("intro-text");
+  var subEl = document.getElementById("intro-sub");
+  var hintEl = document.getElementById("intro-hint");
+  var particlesEl = document.getElementById("intro-particles");
+  var audio = document.getElementById("bg-audio");
+  var toggleBtn = document.getElementById("audio-toggle");
+  if(!overlay||!textEl||!audio) return;
+  var SPEED = 65;
+  var GLOW_MS = 2200;
+  var TITLE = [
+    {t:"Yearbook ",a:false},
+    {t:"Vianney's Student ",a:true},
+    {t:"2025/2026",a:false}
+  ];
+  var full = "";
+  TITLE.forEach(function(p){ full += p.t; });
+  var idx = 0;
+  var cur = '<span class="cursor"></span>';
+
+  function htmlAt(){
+    var n = 0, r = "";
+    for(var i=0;i<TITLE.length;i++){
+      var p=TITLE[i], len=p.t.length;
+      if(idx<=n) break;
+      var take=Math.min(idx-n,len);
+      var s=p.t.substring(0,take);
+      r += p.a ? '<span class="intro-accent">'+s+'</span>' : s;
+      n += len;
+    }
+    return r;
+  }
+
+  function type(){
+    if(idx <= full.length){
+      textEl.innerHTML = htmlAt() + cur;
+      idx++;
+      setTimeout(type, SPEED);
+    } else {
+      textEl.classList.add("glow");
+      if(subEl) subEl.classList.add("show");
+      if(hintEl) hintEl.classList.add("show");
+      if(particlesEl) spawnParticles();
+      setTimeout(startReveal, GLOW_MS);
+    }
+  }
+
+  function spawnParticles(){
+    var count = 30;
+    var cx = 50, cy = 45;
+    for(var i=0; i<count; i++){
+      var el = document.createElement("div");
+      el.className = "intro-particle";
+      var angle = Math.random() * Math.PI * 2;
+      var r1 = 20 + Math.random() * 30;
+      var r2 = 80 + Math.random() * 120;
+      var dx1 = Math.cos(angle) * r1;
+      var dy1 = Math.sin(angle) * r1;
+      var dx2 = Math.cos(angle) * r2;
+      var dy2 = Math.sin(angle) * r2;
+      var dur = 1.5 + Math.random() * 1.5;
+      var del = Math.random() * 0.8;
+      var size = 2 + Math.random() * 4;
+      el.style.cssText = "left:"+cx+"%;top:"+cy+"%;width:"+size+"px;height:"+size+"px;"+
+        "--dx1:"+dx1+"px;--dy1:"+dy1+"px;--dx2:"+dx2+"px;--dy2:"+dy2+"px;"+
+        "--dur:"+dur+"s;--delay:"+del+"s;";
+      particlesEl.appendChild(el);
+    }
+  }
+
+  function startReveal(){
+    overlay.classList.add("reveal");
+    overlay.addEventListener("animationend", function(){
+      overlay.style.display = "none";
+      if(toggleBtn) toggleBtn.classList.add("visible");
+    }, {once:true});
+  }
+
+  audio.volume = 0.5;
+  var audioReady = false;
+
+  function startAudio(){
+    if(audioReady) return;
+    audio.muted = false;
+    audio.volume = 0.5;
+    audio.play().then(function(){
+      audioReady = true;
+    }).catch(function(){});
+  }
+
+  startAudio();
+
+  document.addEventListener("click", function(){ startAudio(); });
+  document.addEventListener("touchstart", function(){ startAudio(); });
+  document.addEventListener("keydown", function(){ startAudio(); });
+
+  var playSVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
+  var pauseSVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+
+  function syncIcon(){
+    if(!toggleBtn||!audio) return;
+    toggleBtn.innerHTML = audio.paused ? playSVG : pauseSVG;
+    toggleBtn.classList.toggle("paused", audio.paused);
+  }
+
+  if(toggleBtn) toggleBtn.addEventListener("click", function(e){
+    e.stopPropagation();
+    audio.muted = false;
+    if(audio.paused){
+      audio.play().then(function(){ audioReady = true; }).catch(function(){});
+    } else {
+      audio.pause();
+    }
+  });
+  if(audio){
+    audio.addEventListener("play", syncIcon);
+    audio.addEventListener("pause", syncIcon);
+  }
+  syncIcon();
+
+  setTimeout(type, 600);
+})()}catch(e){}
