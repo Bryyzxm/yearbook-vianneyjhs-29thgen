@@ -74,30 +74,12 @@ PD.forEach(function(p){ MSG_KEYS[p.id] = []; });
 var CUR = null;
 var APWD = "admin123";
 var DEL_PID = null, DEL_IDX = null;
-var ADMIN_MODE = false;
-var ADMIN_KEY_COUNT = 0;
-var ADMIN_KEY_TIMER = null;
 var REACTIONS = {};
 var REACTIONS_REF = db.ref('reactions');
 var MY_ID = localStorage.getItem('ybid');
 if(!MY_ID){
   MY_ID = 'u'+Date.now().toString(36)+Math.random().toString(36).substr(2,9);
   localStorage.setItem('ybid',MY_ID);
-}
-
-function setAdminMode(next){
-  ADMIN_MODE = next;
-  var btn = document.getElementById("admin-toggle");
-  if(btn){
-    if(ADMIN_MODE){
-      btn.classList.add("active");
-      btn.setAttribute("aria-pressed","true");
-    } else {
-      btn.classList.remove("active");
-      btn.setAttribute("aria-pressed","false");
-    }
-  }
-  if(CUR){ renderMsgs(CUR.id); }
 }
 
 function ts(){
@@ -275,7 +257,7 @@ function renderMsgs(id){
     var hasHearted = heartUsers.indexOf(MY_ID) !== -1;
     var hasLaughed = laughUsers.indexOf(MY_ID) !== -1;
     html += "<div class='mbub'>"
-      +(ADMIN_MODE ? "<button class='dbtn' data-pid='"+id+"' data-idx='"+i+"'>Hapus</button>" : "")
+      +"<button class='dbtn' data-pid='"+id+"' data-idx='"+i+"'>Hapus</button>"
       +"<div class='mtxt'>"+esc(msg.text)+catLabel+"</div>"
       +"<div class='mmeta'>"+msg.time+"</div>"
       +"<div class='reactions'>"
@@ -424,10 +406,6 @@ document.getElementById("btn-cancel").addEventListener("click",closeModal);
 document.getElementById("btn-confirm").addEventListener("click",confirmDel);
 document.getElementById("del-pw").addEventListener("keydown",function(e){ if(e.key==="Enter") confirmDel(); });
 document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeModal(); });
-document.getElementById("admin-toggle").addEventListener("click",function(){
-  setAdminMode(!ADMIN_MODE);
-  showToast(ADMIN_MODE ? "Admin mode aktif" : "Admin mode nonaktif");
-});
 
 document.getElementById("eye-btn").addEventListener("click",function(){
   var inp = document.getElementById("del-pw");
@@ -442,20 +420,6 @@ document.getElementById("eye-btn").addEventListener("click",function(){
   inp.focus();
 });
 
-document.addEventListener("keydown",function(e){
-  if(e.key === "a" || e.key === "A"){
-    ADMIN_KEY_COUNT++;
-    if(ADMIN_KEY_TIMER) clearTimeout(ADMIN_KEY_TIMER);
-    ADMIN_KEY_TIMER = setTimeout(function(){ ADMIN_KEY_COUNT = 0; }, 1000);
-    if(ADMIN_KEY_COUNT >= 3){
-      ADMIN_KEY_COUNT = 0;
-      setAdminMode(!ADMIN_MODE);
-      showToast(ADMIN_MODE ? "Admin mode aktif" : "Admin mode nonaktif");
-    }
-  }
-});
-
-setAdminMode(false);
 buildGrid();
 
 document.addEventListener("click",function(e){
